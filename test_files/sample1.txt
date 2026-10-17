@@ -1,0 +1,4 @@
+
+Java supports multithreading.
+Multiple threads can execute tasks concurrently.
+Thread safety is important in concurrent applications.

@@ -1,0 +1,4 @@
+files_tested,available_processors,thread_count,elapsed_ms,speedup,files_per_second
+3,4,1,22,1.0000,136.3636
+3,4,4,3,7.3333,1000.0000
+3,4,8,2,11.0000,1500.0000
