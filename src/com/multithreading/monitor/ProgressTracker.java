@@ -47,7 +47,7 @@ public class ProgressTracker {
         return failedFiles.get();
     }
 
-    public double getProgressPercentage() {
+    public synchronized double getProgressPercentage() {
         if (totalFiles == 0) {
             return 100.0;
         }
@@ -58,10 +58,10 @@ public class ProgressTracker {
     public synchronized void displayProgress() {
         System.out.printf(
                 "Progress: %d/%d files (%.1f%%) | Success: %d | Failed: %d%n",
-                getCompletedFiles(),
+                completedFiles.get(),
                 totalFiles,
                 getProgressPercentage(),
-                getSuccessfulFiles(),
-                getFailedFiles());
+                successfulFiles.get(),
+                failedFiles.get());
     }
 }

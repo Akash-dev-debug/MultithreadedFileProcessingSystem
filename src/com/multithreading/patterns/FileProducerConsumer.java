@@ -39,6 +39,14 @@ public class FileProducerConsumer {
             ProgressTracker progressTracker,
             ProcessingStatistics processingStatistics) {
 
+        if (fileQueue == null || executor == null
+                || processedCount == null || failedCount == null
+                || resultRegistry == null || progressTracker == null
+                || processingStatistics == null) {
+            throw new IllegalArgumentException(
+                    "Dependencies cannot be null.");
+        }
+
         if (workerCount <= 0) {
             throw new IllegalArgumentException(
                     "Worker count must be greater than zero.");
@@ -57,6 +65,11 @@ public class FileProducerConsumer {
     public void processFiles(List<Path> files)
             throws InterruptedException, ExecutionException {
 
+        if (files == null) {
+            throw new IllegalArgumentException(
+                    "File list cannot be null.");
+        }
+
         List<Future<?>> consumers = new ArrayList<>();
 
         try {
@@ -65,6 +78,10 @@ public class FileProducerConsumer {
             }
 
             for (Path file : files) {
+                if (file == null) {
+                    throw new IllegalArgumentException(
+                            "File list cannot contain null paths.");
+                }
                 fileQueue.addFile(file);
             }
 
@@ -76,12 +93,21 @@ public class FileProducerConsumer {
                 consumer.get();
             }
 
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException
+                 | RuntimeException e) {
             for (Future<?> consumer : consumers) {
                 consumer.cancel(true);
             }
 
-            Thread.currentThread().interrupt();
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+                throw (InterruptedException) e;
+            }
+
+            if (e instanceof ExecutionException) {
+                throw (ExecutionException) e;
+            }
+
             throw e;
         }
     }
@@ -112,7 +138,6 @@ public class FileProducerConsumer {
                             result.get("filename"),
                             result.get("status"));
 
-                   
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return;
